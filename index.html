@@ -33,18 +33,21 @@
 
         /* --- Animációk --- */
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .fade-in {
-            animation: fadeInUp 0.8s ease forwards;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .fade-in { opacity: 0; } /* Kezdetben rejtve az Intersection Observer miatt */
+
+        .error-shake {
+            animation: shake 0.2s ease-in-out 0s 2;
+            border: 2px solid var(--police-red) !important;
         }
 
         /* --- Fejléc (Header) --- */
@@ -80,11 +83,11 @@
             transition: var(--transition);
         }
 
-        nav a:hover {
-            color: #ccc;
+        /* --- Hero Szekció --- */
+        #main-content {
+            transition: transform 0.2s;
         }
 
-        /* --- Hero Szekció --- */
         .hero {
             display: flex;
             flex-wrap: wrap;
@@ -106,6 +109,7 @@
             border-radius: 8px;
             box-shadow: var(--shadow);
             border: 5px solid var(--white);
+            transition: transform 0.2s;
         }
 
         .hero-content {
@@ -142,18 +146,6 @@
             font-weight: bold;
         }
 
-        .data-item span {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .description {
-            margin: 20px 0;
-            background: rgba(0, 45, 90, 0.05);
-            padding: 20px;
-            border-radius: 8px;
-        }
-
         .alert-box {
             background-color: var(--police-red);
             color: var(--white);
@@ -163,6 +155,20 @@
             text-align: center;
             box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
             margin-top: 20px;
+        }
+
+        /* --- Hibaüzenet konténer --- */
+        #system-message {
+            display: none;
+            background-color: rgba(211, 47, 47, 0.1);
+            border: 1px solid var(--police-red);
+            color: var(--police-red);
+            padding: 15px;
+            margin: 20px 5%;
+            text-align: center;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: 4px;
         }
 
         /* --- Dokumentumtár --- */
@@ -176,17 +182,6 @@
             margin-bottom: 3rem;
             color: var(--police-blue);
             position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            width: 50px;
-            height: 3px;
-            background: var(--police-red);
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
         }
 
         .doc-grid {
@@ -212,22 +207,6 @@
             box-shadow: var(--shadow);
         }
 
-        .doc-icon {
-            font-size: 2rem;
-            color: var(--police-blue);
-        }
-
-        .doc-card h3 {
-            font-size: 1.2rem;
-            color: var(--police-blue);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: auto;
-        }
-
         .btn {
             flex: 1;
             padding: 10px;
@@ -246,20 +225,13 @@
             color: var(--white);
         }
 
-        .btn-open:hover {
-            background-color: var(--police-blue-dark);
-        }
-
         .btn-download {
             background-color: #eee;
             color: var(--text-dark);
         }
 
-        .btn-download:hover {
-            background-color: #ddd;
-        }
+        .hidden { display: none !important; }
 
-        /* --- Lábléc (Footer) --- */
         footer {
             background-color: var(--police-blue-dark);
             color: #aaa;
@@ -268,30 +240,9 @@
             font-size: 0.9rem;
         }
 
-        /* --- Reszponzív nézet (Mobil) --- */
         @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .hero {
-                padding: 2rem 5%;
-                text-align: center;
-            }
-
-            .hero-content h2 {
-                font-size: 1.8rem;
-            }
-
-            .data-item {
-                text-align: left;
-            }
-
-            .doc-grid {
-                grid-template-columns: 1fr;
-            }
+            .hero { padding: 2rem 5%; text-align: center; }
+            .data-item { text-align: left; }
         }
     </style>
 </head>
@@ -307,13 +258,15 @@
         </nav>
     </header>
 
-    <main>
+    <div id="system-message">RENDSZERÜZENET: Hozzáférés megtagadva. (Kód: ERR-403)</div>
+
+    <main id="main-content">
         <section class="hero fade-in">
             <div class="hero-image">
-                <img src="https://via.placeholder.com/400x500/002d5a/ffffff?text=ELTŰNT+SZEMÉLY" alt="Eltűnt személy fotója">
+                <img id="subject-image" src="frodo.png" alt="Eltűnt személy fotója">
             </div>
             <div class="hero-content">
-                <h2>Frodó</h2>
+                <h2>Frodó Péter</h2>
                 
                 <div class="data-grid">
                     <div class="data-item">
@@ -322,7 +275,7 @@
                     </div>
                     <div class="data-item">
                         <label>Eltűnés dátuma</label>
-                        <span>2026. április 12.</span>
+                        <span>2026. április 25.</span>
                     </div>
                     <div class="data-item">
                         <label>Eltűnés helye</label>
@@ -330,8 +283,8 @@
                     </div>
                 </div>
 
-                <div class="description">
-                    <p><strong>Személyleírás:</strong> Körülbelül 175 cm magas, vékony testalkatú. Utoljára sötétkék kapucnis pulóverben, fekete nadrágban és fehér sportcipőben látták. Rövid, barna haja van, szeme színe barna.</p>
+                <div style="background: rgba(0, 45, 90, 0.05); padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p><strong>Személyleírás:</strong> Körülbelül 175 cm magas, vékony testalkatú. Utoljára sötétkék kapucnis pulóverben, fekete nadrágban és fehér sportcipőben látták.</p>
                 </div>
 
                 <div class="alert-box">
@@ -345,34 +298,35 @@
             <div class="doc-grid">
                 
                 <div class="doc-card fade-in">
-                    <div class="doc-icon">📄</div>
+                    <div style="font-size: 2rem;">📄</div>
                     <h3>Körözési plakát (PDF)</h3>
-                    <p>Nyomtatható hirdetmény a keresett személy adataival és fényképével.</p>
-                    <div class="btn-group">
-                        <a href="#" target="_blank" class="btn btn-open">Megnyitás</a>
-                        <a href="#" class="btn btn-download">Letöltés</a>
+                    <p>Nyomtatható hirdetmény a keresett személy adataival.</p>
+                    <div style="display: flex; gap: 10px; margin-top: auto;">
+                        <a href="korozesi_plakat.png" target="_blank" class="btn btn-open">Megnyitás</a>
+                        <a href="korozesi_plakat.png" class="btn btn-download">Letöltés</a>
                     </div>
                 </div>
 
-                <div class="doc-card fade-in">
-                    <div class="doc-icon">📝</div>
+                <div class="doc-card fade-in" id="restricted-doc">
+                    <div style="font-size: 2rem;">📝</div>
                     <h3>Részletes jegyzőkönyv</h3>
-                    <p>Az eltűnés körülményeit rögzítő hivatalos rendőrségi dokumentum kivonata.</p>
-                    <div class="btn-group">
-                        <a href="#" target="_blank" class="btn btn-open">Megnyitás</a>
-                        <a href="#" class="btn btn-download">Letöltés</a>
+                    <p>Hivatalos rendőrségi dokumentum a nyomozás állásáról.</p>
+                    <div style="display: flex; gap: 10px; margin-top: auto;">
+                        <button onclick="deniedAccess()" class="btn btn-open">Megnyitás</button>
+                        <button onclick="deniedAccess()" class="btn btn-download">Letöltés</button>
                     </div>
                 </div>
 
-                <div class="doc-card fade-in">
-                    <div class="doc-icon">📂</div>
-                    <h3>Tanúvallomás kivonat</h3>
-                    <p>A szemtanúk által közölt legfontosabb információk összefoglalása.</p>
-                    <div class="btn-group">
-                        <a href="#" target="_blank" class="btn btn-open">Megnyitás</a>
-                        <a href="#" class="btn btn-download">Letöltés</a>
-                    </div>
-                </div>
+<div class="doc-card fade-in">
+    <div style="font-size: 2rem;">📂</div>
+    <h3>Egyéb adatok</h3>
+    <p>Dokumentumtárban talált releváns adatok.</p>
+    <div style="display: flex; gap: 10px; margin-top: auto;">
+        <a href="toxikologia_kristály.pdf" target="_blank" class="btn btn-open">Megnyitás</a>
+        
+        <a href="toxikologia_kristály.pdf" download="Relevans_Adatok_2026.pdf" class="btn btn-download">Letöltés</a>
+    </div>
+</div>
 
             </div>
         </section>
@@ -380,43 +334,53 @@
 
     <footer>
         <p>&copy; 2026 Magyar Rendőrség - Minden jog fenntartva.</p>
-        <p style="margin-top: 10px; font-size: 0.7rem;">1139 Budapest, Teve utca 4-6</p>
     </footer>
 
     <script>
-        // Smooth scroll a navigációhoz
+        // Smooth scroll
         document.querySelectorAll('nav a').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetId = this.getAttribute('href');
                 if (targetId !== "#") {
-                    document.querySelector(targetId).scrollIntoView({
-                        behavior: 'smooth'
-                    });
+                    document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
                 }
             });
         });
 
-        // Megjelenési animáció görgetéskor (Intersection Observer)
-        const observerOptions = {
-            threshold: 0.1
-        };
+        // Hozzáférés megtagadása funkció
+        function deniedAccess() {
+            const content = document.getElementById('main-content');
+            const message = document.getElementById('system-message');
+            const card = document.getElementById('restricted-doc');
 
+            // Megremegtetjük a tartalmat és a kártyát
+            content.classList.add('error-shake');
+            card.style.borderColor = "var(--police-red)";
+            
+            // Megjelenítjük a piros hibaüzenetet
+            message.style.display = "block";
+
+            // 2 másodperc után visszaállítjuk az állapotot
+            setTimeout(() => {
+                content.classList.remove('error-shake');
+                message.style.display = "none";
+                card.style.borderColor = "#eee";
+            }, 2000);
+        }
+
+        // Megjelenési animáció görgetéskor
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.style.opacity = "1";
                     entry.target.style.transform = "translateY(0)";
+                    entry.target.style.transition = "all 0.8s ease-out";
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.1 });
 
-        document.querySelectorAll('.fade-in').forEach(el => {
-            el.style.opacity = "0";
-            el.style.transform = "translateY(30px)";
-            el.style.transition = "all 0.8s ease-out";
-            observer.observe(el);
-        });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     </script>
 </body>
 </html>
